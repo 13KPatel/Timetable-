@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<title>Kam's Plan</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:#0A0A0F;color:#E2E8F0;font-family:-apple-system,BlinkMacSystemFont,sans-serif;min-height:100vh;padding-bottom:80px;max-width:480px;margin:0 auto}
+button{cursor:pointer;font-family:inherit}
+input,textarea,select{font-family:inherit;color:#E2E8F0;outline:none}
+input::placeholder,textarea::placeholder{color:#475569}
+.inp{background:rgba(255,255,255,0.07);border:1px solid #2D2D3A;border-radius:8px;color:#E2E8F0;font-size:13px;padding:8px 12px;width:100%}
+select.inp option{background:#1E1E2E;color:#E2E8F0}
+
+/* HEADER */
+#header{background:#0F0F1A;border-bottom:1px solid #1E1E2E;padding:20px 20px 0}
+.eyebrow{font-size:10px;letter-spacing:3px;color:#F59E0B;font-weight:600;margin-bottom:4px}
+.page-title{font-size:26px;font-weight:800;letter-spacing:-0.5px;margin-bottom:16px}
+.day-tabs{display:flex;overflow-x:auto;scrollbar-width:none}
+.day-tabs::-webkit-scrollbar{display:none}
+.day-tab{flex:0 0 auto;background:none;border:none;border-bottom:2px solid transparent;color:#475569;font-size:11px;font-weight:600;letter-spacing:1.5px;padding:10px 14px;transition:all .2s}
+.day-tab.active{color:#F59E0B;border-bottom-color:#F59E0B}
+
+/* NAV */
+#nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#0F0F1A;border-top:1px solid #1E1E2E;display:flex;padding:8px 0 16px;z-index:100}
+.nav-btn{flex:1;background:none;border:none;color:#475569;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 0;transition:color .2s}
+.nav-btn.active{color:#F59E0B}
+.nav-icon{font-size:20px}
+.nav-label{font-size:10px;font-weight:600;letter-spacing:1px}
+
+/* TABS */
+.tab{display:none;padding:16px}
+.tab.active{display:block}
+
+/* FOCUS BANNER */
+.focus-banner{background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:12px;padding:16px;margin-bottom:16px}
+.focus-btn{background:none;border:none;color:#F59E0B;font-size:13px;font-weight:600;padding:0}
+.focus-text{font-size:13px;color:#CBD5E1;line-height:1.6;margin:0}
+
+/* BLOCKS */
+.blocks{display:flex;flex-direction:column;gap:8px}
+.block{border-radius:10px;border:1px solid #1E1E2E;border-left-width:3px;background:rgba(255,255,255,0.03);overflow:hidden;transition:background .2s,border-color .2s}
+.block-row{display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer}
+.block-time{flex:0 0 auto;text-align:right;min-width:58px}
+.block-time-main{font-size:11px;font-weight:600}
+.block-time-dur{font-size:10px;color:#334155;margin-top:2px}
+.block-divider{width:1px;height:30px;background:#1E1E2E;flex:0 0 auto}
+.block-info{flex:1;min-width:0}
+.block-title{font-size:14px;font-weight:600;color:#E2E8F0}
+.block-icons{font-size:13px;margin-top:3px}
+.block-arrow{color:#334155;font-size:18px;transition:transform .2s}
+.block-arrow.open{transform:rotate(90deg)}
+.block-detail{padding:0 14px 14px;display:none}
+.block-detail.open{display:block}
+.block-desc{font-size:13px;color:#94A3B8;line-height:1.6;margin-bottom:10px}
+.tip-box{background:rgba(255,255,255,0.04);border-radius:8px;padding:12px;margin-bottom:10px}
+.tip-text{font-size:12px;color:#CBD5E1;line-height:1.6;margin:0}
+.tip-btn{background:none;border:none;color:#60A5FA;font-size:12px;padding:0}
+.block-actions{display:flex;gap:8px}
+.edit-btn{flex:1;background:rgba(255,255,255,0.06);color:#94A3B8;border:none;border-radius:8px;padding:8px;font-size:12px}
+.del-btn{background:rgba(239,68,68,0.1);color:#EF4444;border:none;border-radius:8px;padding:8px 14px;font-size:12px}
+
+/* EDIT FORM */
+.edit-form{padding:14px;display:flex;flex-direction:column;gap:8px}
+.form-row{display:flex;gap:8px}
+.form-row .inp{flex:1}
+.save-btn{flex:1;background:#F59E0B;color:#0A0A0F;border:none;border-radius:8px;padding:10px;font-weight:700;font-size:13px}
+.cancel-btn{flex:1;background:rgba(255,255,255,0.06);color:#94A3B8;border:none;border-radius:8px;padding:10px;font-size:13px}
+
+/* ADD BLOCK */
+.add-block-form{background:rgba(255,255,255,0.03);border:1px solid #2D2D3A;border-radius:10px;padding:14px;margin-top:12px;display:flex;flex-direction:column;gap:8px}
+.add-block-btn{width:100%;margin-top:12px;background:rgba(255,255,255,0.02);border:1px dashed #2D2D3A;border-radius:10px;color:#475569;font-size:13px;padding:14px}
+
+/* GOALS */
+.section-label{font-size:10px;letter-spacing:2px;font-weight:600;margin-bottom:8px}
+.goal-section{margin-bottom:20px}
+.goal-list{display:flex;flex-direction:column;gap:8px}
+.goal-item{border-radius:10px;border:1px solid #1E1E2E;background:rgba(255,255,255,0.02);overflow:hidden;transition:all .2s}
+.goal-item.on{border-color:var(–border)}
+.goal-main{display:flex;align-items:center;gap:12px;padding:12px 14px}
+.goal-icon{font-size:20px}
+.goal-label{flex:1;font-size:14px;font-weight:500;color:#475569;transition:color .2s}
+.goal-item.on .goal-label{color:#E2E8F0}
+.goal-check{width:22px;height:22px;border-radius:6px;background:#1E1E2E;display:flex;align-items:center;justify-content:center;flex:0 0 auto;transition:background .2s}
+.goal-item.on .goal-check{background:var(–color)}
+.goal-check-inner{color:#0A0A0F;font-size:13px;font-weight:800;display:none}
+.goal-item.on .goal-check-inner{display:block}
+.goal-remove{background:none;border:none;color:#334155;font-size:18px;padding:0 0 0 8px;line-height:1}
+.confirm-delete{padding:12px 14px}
+.confirm-text{font-size:12px;color:#94A3B8;margin-bottom:10px}
+.confirm-btns{display:flex;gap:8px}
+.confirm-yes{flex:1;background:rgba(239,68,68,0.15);color:#EF4444;border:1px solid rgba(239,68,68,0.3);border-radius:8px;padding:8px;font-size:12px;font-weight:600}
+.confirm-no{flex:1;background:rgba(255,255,255,0.05);color:#94A3B8;border:none;border-radius:8px;padding:8px;font-size:12px}
+
+/* ADD GOAL FORM */
+.add-goal-form{background:rgba(255,255,255,0.03);border:1px solid #2D2D3A;border-radius:10px;padding:16px;margin-top:8px;display:flex;flex-direction:column;gap:12px}
+.form-label{font-size:11px;color:#475569;margin-bottom:6px}
+.icon-grid{display:flex;flex-wrap:wrap;gap:6px}
+.icon-btn{background:rgba(255,255,255,0.04);border:1px solid transparent;border-radius:8px;padding:6px 8px;font-size:18px}
+.icon-btn.sel{background:rgba(245,158,11,0.2);border-color:#F59E0B}
+.cat-grid{display:flex;gap:6px;flex-wrap:wrap}
+.cat-btn{background:rgba(255,255,255,0.04);border:1px solid transparent;border-radius:8px;padding:6px 10px;font-size:11px;color:#475569;font-weight:400}
+.cat-btn.sel{font-weight:600}
+.add-goal-btn{width:100%;margin-top:8px;background:rgba(255,255,255,0.02);border:1px dashed #2D2D3A;border-radius:10px;color:#475569;font-size:13px;padding:14px}
+
+/* WEEK */
+.week-day{margin-bottom:20px}
+.week-day-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.week-day-name{font-size:12px;font-weight:700;letter-spacing:1.5px;color:#64748B}
+.week-day-name.today{color:#F59E0B}
+.week-view-btn{background:none;border:none;color:#475569;font-size:11px}
+.week-block{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.02);border-radius:4px;padding:6px 10px;margin-bottom:4px;border-left:2px solid}
+.week-time{font-size:11px;min-width:58px;flex:0 0 auto}
+.week-title{font-size:12px;color:#94A3B8}
+</style>
+
+</head>
+<body>
+
+<div id="header">
+  <div class="eyebrow">KAM'S PLAN</div>
+  <div class="page-title" id="pageTitle">Monday</div>
+  <div class="day-tabs" id="dayTabs"></div>
+</div>
+
+<div id="todayTab" class="tab active">
+  <div class="focus-banner">
+    <button class="focus-btn" id="focusBtn" onclick="getDailyTip()">✦ Get today's focus message</button>
+    <p class="focus-text" id="focusText" style="display:none"></p>
+  </div>
+  <div class="blocks" id="blocksList"></div>
+  <div id="addBlockArea"></div>
+</div>
+
+<div id="goalsTab" class="tab">
+  <p style="font-size:12px;color:#64748B;margin-bottom:16px">Toggle goals on/off, add new ones, or remove them entirely.</p>
+  <div id="goalsList"></div>
+  <div id="addGoalArea"></div>
+</div>
+
+<div id="weekTab" class="tab">
+  <div id="weekView"></div>
+</div>
+
+<div id="nav">
+  <button class="nav-btn active" onclick="switchTab('today')" id="navToday">
+    <span class="nav-icon">📅</span><span class="nav-label">TODAY</span>
+  </button>
+  <button class="nav-btn" onclick="switchTab('goals')" id="navGoals">
+    <span class="nav-icon">🎯</span><span class="nav-label">GOALS</span>
+  </button>
+  <button class="nav-btn" onclick="switchTab('week')" id="navWeek">
+    <span class="nav-icon">📆</span><span class="nav-label">WEEK</span>
+  </button>
+</div>
+
+<script>
+const CAT_COLORS = {
+  mind:     {color:"#C084FC",bg:"rgba(192,132,252,0.12)",border:"rgba(192,132,252,0.25)"},
+  body:     {color:"#34D399",bg:"rgba(52,211,153,0.12)", border:"rgba(52,211,153,0.25)"},
+  career:   {color:"#F59E0B",bg:"rgba(245,158,11,0.12)", border:"rgba(245,158,11,0.25)"},
+  learning: {color:"#60A5FA",bg:"rgba(96,165,250,0.12)", border:"rgba(96,165,250,0.25)"},
+  social:   {color:"#F472B6",bg:"rgba(244,114,182,0.12)",border:"rgba(244,114,182,0.25)"},
+  routine:  {color:"#94A3B8",bg:"rgba(148,163,184,0.08)",border:"rgba(148,163,184,0.18)"},
+};
+const CAT_LABELS = {mind:"Mind & Soul",body:"Body & Health",career:"Career & Business",learning:"Learning & Culture",social:"Social & Relationships"};
+const QUICK_ICONS = ["⭐","🏆","💡","🎯","🔥","💰","🧠","🏃","😴","🎨","🎵","📝","🌱","🤸","🧘","❤️","💙","✨","🌍","🚀"];
+const DAYS_FULL  = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+const DAYS_SHORT = ["MON","TUE","WED","THU","FRI","SAT","SUN"];
+
+let goals = [
+  {id:"G1", label:"Build a Routine",          icon:"⏰", cat:"mind"},
+  {id:"G2", label:"Treat Body Better",         icon:"💪", cat:"body"},
+  {id:"G3", label:"Balanced Diet",             icon:"🥗", cat:"body"},
+  {id:"G4", label:"Start a Business",          icon:"🚀", cat:"career"},
+  {id:"G5", label:"Read Every Day",            icon:"📚", cat:"learning"},
+  {id:"G6", label:"Commercial Knowledge",      icon:"📊", cat:"career"},
+  {id:"G7", label:"Learn Guitar",              icon:"🎸", cat:"learning"},
+  {id:"G8", label:"Quality Social Group",      icon:"🤝", cat:"social"},
+  {id:"G9", label:"Play Tennis",               icon:"🎾", cat:"body"},
+  {id:"G10",label:"Peace of Mind",             icon:"🧘", cat:"mind"},
+  {id:"G11",label:"Remove Past Trauma",        icon:"💙", cat:"mind"},
+  {id:"G13",label:"Learn History & Culture",   icon:"🌍", cat:"learning"},
+  {id:"G14",label:"Healthy Relationship",      icon:"❤️", cat:"social"},
+  {id:"G15",label:"Speak to Myself with Love", icon:"✨", cat:"mind"},
+];
+
+let activeGoals = new Set(goals.map(g=>g.id));
+
+let blocks = [
+  {id:1, time:"06:00",dur:20, title:"Journaling & Gratitude",   cat:"mind",    goals:["G15","G10","G11"],desc:"3 things you're grateful for. Set 3 intentions. Reframe any negative self-talk.",days:[0,1,2,3,4,5,6]},
+  {id:2, time:"06:20",dur:10, title:"Morning Routine",          cat:"routine", goals:["G1"],            desc:"Cold shower, get dressed, prep mentally for the day.",days:[0,1,2,3,4]},
+  {id:3, time:"06:30",dur:60, title:"Gym Session",              cat:"body",    goals:["G2","G3"],        desc:"Log your lifts. Weights Mon/Wed/Fri, cardio or tennis alternate days.",days:[0,2,4,5]},
+  {id:4, time:"08:00",dur:30, title:"Healthy Breakfast",        cat:"body",    goals:["G3"],            desc:"Low carb, high protein. Prep the night before when possible.",days:[0,1,2,3,4,5,6]},
+  {id:5, time:"09:00",dur:480,title:"Work / Deep Work",         cat:"career",  goals:["G6"],            desc:"Prioritise hardest tasks in the morning. One commercial learning goal per day.",days:[0,1,2,3,4]},
+  {id:6, time:"18:00",dur:30, title:"Reading Block",            cat:"learning",goals:["G5","G13"],       desc:"20+ pages minimum. Non-fiction, history, or culture. No screens.",days:[0,1,2,3,4,5,6]},
+  {id:7, time:"18:30",dur:30, title:"Guitar Practice",          cat:"learning",goals:["G7"],            desc:"15-30 mins. Justin Guitar or Fender Play. Focus on one song per week.",days:[0,2,3,5,6]},
+  {id:8, time:"18:00",dur:90, title:"Tennis",                   cat:"body",    goals:["G9"],            desc:"Book a court. Find a regular partner. Keep score to stay competitive.",days:[1,6]},
+  {id:9, time:"19:30",dur:90, title:"Business / Side Hustle",   cat:"career",  goals:["G4","G6"],       desc:"AI agency or Trust Manager app. Build, pitch, or research. Ship something.",days:[0,2,3]},
+  {id:10,time:"19:00",dur:60, title:"Social / Relationships",   cat:"social",  goals:["G8","G14"],      desc:"Reach out intentionally. Make plans. Invest in quality people.",days:[2,4]},
+  {id:11,time:"12:00",dur:120,title:"Business Sprint",          cat:"career",  goals:["G4"],            desc:"Biggest block of the week. Focus on Trust Manager app or AI agency.",days:[5]},
+  {id:12,time:"16:00",dur:60, title:"Self-Reflection",          cat:"mind",    goals:["G11","G10"],     desc:"Work through past feelings. Consider professional therapy — highest ROI habit on this list.",days:[6]},
+  {id:13,time:"21:00",dur:60, title:"Wind Down",                cat:"routine", goals:["G1","G10"],      desc:"No screens. Light stretching or walk. Prep tomorrow. Protect your sleep.",days:[0,1,2,3,4,5,6]},
+  {id:14,time:"22:00",dur:480,title:"Sleep",                    cat:"routine", goals:["G1"],            desc:"8 hours non-negotiable. Everything else depends on this.",days:[0,1,2,3,4,5,6]},
+  {id:15,time:"14:00",dur:120,title:"Weekly Business Planning", cat:"career",  goals:["G4","G6"],       desc:"Review goals. Plan next week. Identify one key action to move forward.",days:[6]},
+  {id:16,time:"10:30",dur:60, title:"Meal Prep",                cat:"body",    goals:["G3"],            desc:"Prep healthy meals for the week. Removes daily decision fatigue.",days:[5]},
+  {id:17,time:"18:00",dur:120,title:"Social Evening",           cat:"social",  goals:["G8","G14"],      desc:"Quality time with people you care about. Be fully present.",days:[5]},
+  {id:18,time:"07:30",dur:20, title:"Weekly Review",            cat:"mind",    goals:["G1","G10","G15"],desc:"Score yourself on each goal. What went well? What do you improve next week?",days:[6]},
+];
+
+let tips = {};
+let expandedId = null;
+let editingId = null;
+let confirmDeleteGoal = null;
+let showAddBlock = false;
+let showAddGoal = false;
+let newGoalIcon = "⭐";
+let newGoalCat = "mind";
+let activeDay = (new Date().getDay()===0?6:new Date().getDay()-1);
+let currentTab = "today";
+
+function fmt(t){const[h,m]=t.split(":").map(Number);return`${h%12||12}:${String(m).padStart(2,"0")} ${h>=12?"PM":"AM"}`;}
+function toMins(t){const[h,m]=t.split(":").map(Number);return h*60+m;}
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+
+function switchTab(t){
+  currentTab=t;
+  document.querySelectorAll(".tab").forEach(el=>el.classList.remove("active"));
+  document.querySelectorAll(".nav-btn").forEach(el=>el.classList.remove("active"));
+  document.getElementById(t+"Tab").classList.add("active");
+  document.getElementById("nav"+t.charAt(0).toUpperCase()+t.slice(1)).classList.add("active");
+  const titles={today:DAYS_FULL[activeDay],goals:"Your Goals",week:"This Week"};
+  document.getElementById("pageTitle").textContent=titles[t];
+  document.getElementById("dayTabs").style.display=t==="today"?"flex":"none";
+  if(t==="goals") renderGoals();
+  if(t==="week") renderWeek();
+}
+
+// DAY TABS
+function renderDayTabs(){
+  const el=document.getElementById("dayTabs");
+  el.innerHTML=DAYS_SHORT.map((d,i)=>`<button class="day-tab${i===activeDay?" active":""}" onclick="setDay(${i})">${d}</button>`).join("");
+}
+
+function setDay(i){
+  activeDay=i;
+  expandedId=null;
+  document.getElementById("pageTitle").textContent=DAYS_FULL[i];
+  document.getElementById("focusBtn").style.display="inline";
+  document.getElementById("focusText").style.display="none";
+  renderDayTabs();
+  renderBlocks();
+}
+
+// BLOCKS
+function getTodayBlocks(){
+  return blocks
+    .filter(b=>b.days.includes(activeDay)&&(b.goals.some(g=>activeGoals.has(g))||b.cat==="routine"))
+    .sort((a,b)=>toMins(a.time)-toMins(b.time));
+}
+
+function renderBlocks(){
+  const list=document.getElementById("blocksList");
+  const tb=getTodayBlocks();
+  if(!tb.length){list.innerHTML=`<p style="color:#475569;font-size:13px;text-align:center;padding:20px 0">No blocks for this day. Add one below or activate more goals.</p>`;return;}
+  list.innerHTML=tb.map(block=>{
+    const c=CAT_COLORS[block.cat]||CAT_COLORS.routine;
+    const isOpen=expandedId===block.id;
+    const isEditing=editingId===block.id;
+    const tipKey=`${block.id}-${activeDay}`;
+    const blockIcons=block.goals.filter(g=>activeGoals.has(g)).map(g=>(goals.find(x=>x.id===g)||{}).icon||"").join(" ");
+
+    if(isEditing){
+      const b=blocks.find(x=>x.id===block.id);
+      return`<div class="block" style="border-left-color:${c.color}">
+        <div class="edit-form">
+          <input class="inp" id="ef_title" value="${esc(b.title)}" placeholder="Title"/>
+          <div class="form-row">
+            <input class="inp" id="ef_time" value="${esc(b.time)}" placeholder="HH:MM"/>
+            <input class="inp" id="ef_dur" type="number" value="${b.dur}" placeholder="Mins"/>
+          </div>
+          <textarea class="inp" id="ef_desc" rows="2" placeholder="Notes">${esc(b.desc)}</textarea>
+
+```
+      <div class="form-row">
+        <button class="save-btn" onclick="saveEdit(${block.id})">Save</button>
+        <button class="cancel-btn" onclick="cancelEdit()">Cancel</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+return`<div class="block${isOpen?" open":""}" id="block_${block.id}" style="border-left-color:${c.color};${isOpen?`background:${c.bg};border-color:${c.border};border-left-color:${c.color}`:""}">
+  <div class="block-row" onclick="toggleBlock(${block.id})">
+    <div class="block-time">
+      <div class="block-time-main" style="color:${c.color}">${fmt(block.time)}</div>
+      <div class="block-time-dur">${block.dur}m</div>
+    </div>
+    <div class="block-divider"></div>
+    <div class="block-info">
+      <div class="block-title">${esc(block.title)}</div>
+      <div class="block-icons">${blockIcons}</div>
+    </div>
+    <div class="block-arrow${isOpen?" open":""}">›</div>
+  </div>
+  <div class="block-detail${isOpen?" open":""}">
+    <p class="block-desc">${esc(block.desc)}</p>
+    <div class="tip-box">
+      ${tips[tipKey]
+        ?`<p class="tip-text">✦ ${esc(tips[tipKey])}</p>`
+        :`<button class="tip-btn" onclick="fetchTip(${block.id})">✦ Get AI tip for this block</button>`
+      }
+    </div>
+    <div class="block-actions">
+      <button class="edit-btn" onclick="startEdit(${block.id})">✎ Edit</button>
+      <button class="del-btn" onclick="deleteBlock(${block.id})">✕</button>
+    </div>
+  </div>
+</div>`;
+```
+
+}).join(””);
+renderAddBlockArea();
+}
+
+function toggleBlock(id){
+if(expandedId===id){expandedId=null;}else{expandedId=id;}
+renderBlocks();
+}
+
+function startEdit(id){editingId=id;expandedId=null;renderBlocks();}
+function cancelEdit(){editingId=null;renderBlocks();}
+function saveEdit(id){
+const title=document.getElementById(“ef_title”).value;
+const time=document.getElementById(“ef_time”).value;
+const dur=parseInt(document.getElementById(“ef_dur”).value)||30;
+const desc=document.getElementById(“ef_desc”).value;
+blocks=blocks.map(b=>b.id===id?{…b,title,time,dur,desc}:b);
+editingId=null;renderBlocks();
+}
+function deleteBlock(id){blocks=blocks.filter(b=>b.id!==id);expandedId=null;renderBlocks();}
+
+function renderAddBlockArea(){
+const el=document.getElementById(“addBlockArea”);
+if(showAddBlock){
+el.innerHTML=`<div class="add-block-form"> <input class="inp" id="nb_title" placeholder="Block title"/> <div class="form-row"> <input class="inp" id="nb_time" placeholder="09:00" value="09:00"/> <input class="inp" id="nb_dur" type="number" placeholder="Mins" value="30"/> </div> <select class="inp" id="nb_cat"> <option value="routine">Routine</option> <option value="body">Body &amp; Health</option> <option value="mind">Mind &amp; Soul</option> <option value="career">Career &amp; Business</option> <option value="learning">Learning</option> <option value="social">Social</option> </select> <textarea class="inp" id="nb_desc" rows="2" placeholder="Notes (optional)"></textarea> <div class="form-row"> <button class="save-btn" onclick="addBlock()">Add Block</button> <button class="cancel-btn" onclick="cancelAddBlock()">Cancel</button> </div> </div>`;
+} else {
+el.innerHTML=`<button class="add-block-btn" onclick="openAddBlock()">+ Add a block</button>`;
+}
+}
+
+function openAddBlock(){showAddBlock=true;renderAddBlockArea();}
+function cancelAddBlock(){showAddBlock=false;renderAddBlockArea();}
+function addBlock(){
+const title=document.getElementById(“nb_title”).value.trim();
+if(!title) return;
+const time=document.getElementById(“nb_time”).value||“09:00”;
+const dur=parseInt(document.getElementById(“nb_dur”).value)||30;
+const cat=document.getElementById(“nb_cat”).value;
+const desc=document.getElementById(“nb_desc”).value;
+blocks.push({id:Date.now(),time,dur,title,cat,desc,goals:[“G1”],days:[0,1,2,3,4,5,6]});
+showAddBlock=false;renderBlocks();
+}
+
+// AI TIPS
+async function fetchTip(blockId){
+const block=blocks.find(b=>b.id===blockId);
+if(!block) return;
+const key=`${blockId}-${activeDay}`;
+const tipBox=document.querySelector(`#block_${blockId} .tip-box`);
+if(tipBox) tipBox.innerHTML=`<p class="tip-text" style="color:#F59E0B">⏳ Getting your tip...</p>`;
+const goalLabels=block.goals.filter(g=>activeGoals.has(g)).map(g=>(goals.find(x=>x.id===g)||{}).label).filter(Boolean).join(”, “);
+try{
+const res=await fetch(“https://api.anthropic.com/v1/messages”,{
+method:“POST”,headers:{“Content-Type”:“application/json”},
+body:JSON.stringify({model:“claude-sonnet-4-20250514”,max_tokens:200,
+system:“Direct no-fluff personal coach. User is Kam — 26, ACA-qualified finance professional, building an AI business and UK Trust Manager app. Lost his father in 2023. 2-3 sentences max. Specific and personal.”,
+messages:[{role:“user”,content:`Tip for: "${block.title}" on ${DAYS_FULL[activeDay]}. Goals: ${goalLabels}. Context: ${block.desc}`}]
+})
+});
+const d=await res.json();
+tips[key]=d.content?.[0]?.text||“Focus and execute.”;
+}catch{tips[key]=“Focus on this block. Consistency beats perfection.”;}
+renderBlocks();
+}
+
+async function getDailyTip(){
+document.getElementById(“focusBtn”).textContent=“⏳ Loading…”;
+document.getElementById(“focusBtn”).disabled=true;
+const gl=[…activeGoals].map(g=>(goals.find(x=>x.id===g)||{}).label).filter(Boolean).join(”, “);
+try{
+const res=await fetch(“https://api.anthropic.com/v1/messages”,{
+method:“POST”,headers:{“Content-Type”:“application/json”},
+body:JSON.stringify({model:“claude-sonnet-4-20250514”,max_tokens:200,
+system:“Direct motivating coach. Kam — 26, ACA-qualified, building AI business, lost his dad in 2023. Real not generic. Max 3 sentences.”,
+messages:[{role:“user”,content:`Daily focus for ${DAYS_FULL[activeDay]}. Active goals: ${gl}.`}]
+})
+});
+const d=await res.json();
+const text=d.content?.[0]?.text||“Show up. Do the work. That’s it.”;
+document.getElementById(“focusBtn”).style.display=“none”;
+document.getElementById(“focusText”).style.display=“block”;
+document.getElementById(“focusText”).textContent=text;
+}catch{
+document.getElementById(“focusBtn”).textContent=“✦ Get today’s focus message”;
+document.getElementById(“focusBtn”).disabled=false;
+}
+}
+
+// GOALS
+function renderGoals(){
+const list=document.getElementById(“goalsList”);
+let html=””;
+[“mind”,“body”,“career”,“learning”,“social”].forEach(cat=>{
+const catGoals=goals.filter(g=>g.cat===cat);
+if(!catGoals.length) return;
+const c=CAT_COLORS[cat];
+html+=`<div class="goal-section"> <div class="section-label" style="color:${c.color}">${CAT_LABELS[cat].toUpperCase()}</div> <div class="goal-list"> ${catGoals.map(goal=>{ const on=activeGoals.has(goal.id); if(confirmDeleteGoal===goal.id){ return`<div class=“goal-item${on?” on”:””}” style=”–color:${c.color};–border:${c.border};${on?`background:${c.bg}`:””}”>
+<div class="confirm-delete">
+<p class="confirm-text">Remove “${esc(goal.label)}”?</p>
+<div class="confirm-btns">
+<button class="confirm-yes" onclick="removeGoal('${goal.id}')">Remove</button>
+<button class="confirm-no" onclick="cancelDeleteGoal()">Cancel</button>
+</div>
+</div>
+</div>`; } return`<div class=“goal-item${on?” on”:””}” style=”–color:${c.color};–border:${c.border};${on?`background:${c.bg};border-color:${c.border}`:””}”>
+<div class="goal-main">
+<div style="display:flex;align-items:center;gap:12px;flex:1;cursor:pointer" onclick="toggleGoal('${goal.id}')">
+<span class="goal-icon">${goal.icon}</span>
+<span class="goal-label">${esc(goal.label)}</span>
+<div class=“goal-check” style=”${on?`background:${c.color}`:””}”>
+<span class="goal-check-inner">✓</span>
+</div>
+</div>
+<button class="goal-remove" onclick="askDeleteGoal('${goal.id}')">×</button>
+</div>
+</div>`; }).join("")} </div> </div>`;
+});
+list.innerHTML=html;
+renderAddGoalArea();
+}
+
+function toggleGoal(id){
+if(activeGoals.has(id)) activeGoals.delete(id); else activeGoals.add(id);
+renderGoals();
+}
+function askDeleteGoal(id){confirmDeleteGoal=id;renderGoals();}
+function cancelDeleteGoal(){confirmDeleteGoal=null;renderGoals();}
+function removeGoal(id){
+goals=goals.filter(g=>g.id!==id);
+activeGoals.delete(id);
+confirmDeleteGoal=null;
+renderGoals();
+}
+
+function renderAddGoalArea(){
+const el=document.getElementById(“addGoalArea”);
+if(showAddGoal){
+el.innerHTML=`<div class="add-goal-form"> <div style="font-size:12px;font-weight:600;color:#94A3B8;letter-spacing:1px">NEW GOAL</div> <input class="inp" id="ng_label" placeholder="Goal name e.g. Learn to cook"/> <div> <div class="form-label">Pick an icon</div> <div class="icon-grid">${QUICK_ICONS.map(ic=>`<button class=“icon-btn${ic===newGoalIcon?” sel”:””}” onclick=“setNewGoalIcon(’${ic}’)”>${ic}</button>`).join("")}</div> </div> <div> <div class="form-label">Category</div> <div class="cat-grid">${Object.entries(CAT_LABELS).map(([k,v])=>{ const c=CAT_COLORS[k]; const sel=newGoalCat===k; return`<button class=“cat-btn${sel?” sel”:””}” onclick=“setNewGoalCat(’${k}’)” style=”${sel?`background:${c.bg};border-color:${c.border};color:${c.color}`:“color:#475569”}”>${v}</button>`; }).join("")}</div> </div> <div class="form-row"> <button class="save-btn" onclick="addGoal()">Add Goal</button> <button class="cancel-btn" onclick="cancelAddGoal()">Cancel</button> </div> </div>`;
+} else {
+el.innerHTML=`<button class="add-goal-btn" onclick="openAddGoal()">+ Add a new goal</button>`;
+}
+}
+
+function setNewGoalIcon(ic){newGoalIcon=ic;renderAddGoalArea();}
+function setNewGoalCat(cat){newGoalCat=cat;renderAddGoalArea();}
+function openAddGoal(){showAddGoal=true;renderAddGoalArea();}
+function cancelAddGoal(){showAddGoal=false;newGoalIcon=“⭐”;newGoalCat=“mind”;renderAddGoalArea();}
+function addGoal(){
+const label=document.getElementById(“ng_label”).value.trim();
+if(!label) return;
+const id=“CUSTOM_”+Date.now();
+goals.push({id,label,icon:newGoalIcon,cat:newGoalCat});
+activeGoals.add(id);
+showAddGoal=false;newGoalIcon=“⭐”;newGoalCat=“mind”;
+renderGoals();
+}
+
+// WEEK
+function renderWeek(){
+const el=document.getElementById(“weekView”);
+el.innerHTML=DAYS_FULL.map((day,di)=>{
+const dayBlocks=blocks
+.filter(b=>b.days.includes(di)&&(b.goals.some(g=>activeGoals.has(g))||b.cat===“routine”))
+.sort((a,b)=>toMins(a.time)-toMins(b.time));
+return`<div class="week-day"> <div class="week-day-header"> <div class="week-day-name${di===activeDay?" today":""}">${day.toUpperCase()}</div> <button class="week-view-btn" onclick="setDay(${di});switchTab('today')">View →</button> </div> ${dayBlocks.map(b=>{ const c=CAT_COLORS[b.cat]||CAT_COLORS.routine; return`<div class="week-block" style="border-left-color:${c.color}">
+<span class="week-time" style="color:${c.color}">${fmt(b.time)}</span>
+<span class="week-title">${esc(b.title)}</span>
+</div>`; }).join("")} </div>`;
+}).join(””);
+}
+
+// INIT
+renderDayTabs();
+renderBlocks();
+</script>
+
+</body>
+</html>
